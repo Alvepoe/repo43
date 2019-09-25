@@ -1,19 +1,18 @@
 const express        = require('express');
 const MongoClient    = require('mongodb').MongoClient;
+const db             = require('./config/db');
 const bodyParser     = require('body-parser');
 const app            = express();
 
 const port = 8000;
-require('./app/routes')(app, {});
-app.listen(port, () => {
-    console.log('We are live on ' + port);
+app.use(bodyParser.urlencoded({ extended: true }));
+MongoClient.connect(db.url, (err, client) => {
+    if (err) return console.log("adad" + err);
+    let database = client.db('test');
+    require('./app/routes')(app, database);
+    app.listen(port, () => {
+        console.log('We are live on ' + port);
+    });
 });
 
-module.exports = function(app, db) {
-    app.get('/notes', (req, res) => {
-        // Здесь будем создавать заметку.
-        console.log(req.body);
-        res.send('Hello')
-    });
-};
 
